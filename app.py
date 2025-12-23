@@ -591,7 +591,7 @@ def render_home_page():
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入失意之径", key="btn_scenario_1", width="stretch", use_container_width=True, label_visibility="collapsed"):
+        if st.button("进入失意之径", key="btn_scenario_1", width="stretch", use_container_width=True):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "失意之径"
             st.session_state.dialogue_history = []
@@ -617,7 +617,7 @@ def render_home_page():
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入深谷挑战", key="btn_scenario_2", width="stretch", use_container_width=True, label_visibility="collapsed"):
+        if st.button("进入深谷挑战", key="btn_scenario_2", width="stretch", use_container_width=True):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "深谷挑战"
             st.session_state.dialogue_history = []
@@ -643,7 +643,7 @@ def render_home_page():
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入意志荒漠", key="btn_scenario_3", width="stretch", use_container_width=True, label_visibility="collapsed"):
+        if st.button("进入意志荒漠", key="btn_scenario_3", width="stretch", use_container_width=True):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "意志荒漠"
             st.session_state.dialogue_history = []

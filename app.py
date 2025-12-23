@@ -578,20 +578,20 @@ def render_home_page():
     # 场景 1：失意之径
     with col1:
         st.markdown("""
-        <div class='home-scenario-card'>
-            <div style='font-size: 64px; text-align: center; margin-bottom: 20px;'>😔</div>
-            <h3 style='text-align: center; margin: 0 0 8px 0; font-size: 20px; color: #333;'>失意之径</h3>
-            <p style='text-align: center; margin: 0 0 12px 0; font-size: 14px; color: #999;'>努力后却考砸了</p>
-            <p style='text-align: center; margin: 0 0 24px 0; font-size: 13px; color: #999; line-height: 1.6;'>
+        <div class='home-scenario-card' onclick="document.querySelector('[data-scenario=1]').click();" style='cursor: pointer;'>
+            <div style='font-size: 56px; text-align: center; margin-bottom: 16px;'>😔</div>
+            <h3 style='text-align: center; margin: 0 0 6px 0; font-size: 18px; color: #333; font-weight: 600;'>失意之径</h3>
+            <p style='text-align: center; margin: 0 0 12px 0; font-size: 13px; color: #999;'>努力后却考砸了</p>
+            <p style='text-align: center; margin: 0 0 20px 0; font-size: 12px; color: #aaa; line-height: 1.5;'>
                 当付出努力后却未获得预期成果，内心的失落与困惑油然而生...
             </p>
             <div style='text-align: center;'>
-                <a href='#' style='color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500;'>进入此场景 →</a>
+                <span style='color: #667eea; font-size: 13px; font-weight: 500;'>进入此场景 →</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入失意之径", key="btn_scenario_1", width="stretch", use_container_width=True):
+        if st.button("进入失意之径", key="btn_scenario_1", width="stretch", use_container_width=True, label_visibility="collapsed"):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "失意之径"
             st.session_state.dialogue_history = []
@@ -604,20 +604,20 @@ def render_home_page():
     # 场景 2：深谷挑战
     with col2:
         st.markdown("""
-        <div class='home-scenario-card'>
-            <div style='font-size: 64px; text-align: center; margin-bottom: 20px;'>🤔</div>
-            <h3 style='text-align: center; margin: 0 0 8px 0; font-size: 20px; color: #333;'>深谷挑战</h3>
-            <p style='text-align: center; margin: 0 0 12px 0; font-size: 14px; color: #999;'>深夜遇难题卡住</p>
-            <p style='text-align: center; margin: 0 0 24px 0; font-size: 13px; color: #999; line-height: 1.6;'>
+        <div class='home-scenario-card' onclick="document.querySelector('[data-scenario=2]').click();" style='cursor: pointer;'>
+            <div style='font-size: 56px; text-align: center; margin-bottom: 16px;'>🤔</div>
+            <h3 style='text-align: center; margin: 0 0 6px 0; font-size: 18px; color: #333; font-weight: 600;'>深谷挑战</h3>
+            <p style='text-align: center; margin: 0 0 12px 0; font-size: 13px; color: #999;'>深夜遇难题卡住</p>
+            <p style='text-align: center; margin: 0 0 20px 0; font-size: 12px; color: #aaa; line-height: 1.5;'>
                 面对困难题目，感到无助和困顿，思维陷入僵局...
             </p>
             <div style='text-align: center;'>
-                <a href='#' style='color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500;'>进入此场景 →</a>
+                <span style='color: #667eea; font-size: 13px; font-weight: 500;'>进入此场景 →</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入深谷挑战", key="btn_scenario_2", width="stretch", use_container_width=True):
+        if st.button("进入深谷挑战", key="btn_scenario_2", width="stretch", use_container_width=True, label_visibility="collapsed"):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "深谷挑战"
             st.session_state.dialogue_history = []
@@ -630,20 +630,20 @@ def render_home_page():
     # 场景 3：意志荒漠
     with col3:
         st.markdown("""
-        <div class='home-scenario-card'>
-            <div style='font-size: 64px; text-align: center; margin-bottom: 20px;'>📱</div>
-            <h3 style='text-align: center; margin: 0 0 8px 0; font-size: 20px; color: #333;'>意志荒漠</h3>
-            <p style='text-align: center; margin: 0 0 12px 0; font-size: 14px; color: #999;'>想放弃去刷视频</p>
-            <p style='text-align: center; margin: 0 0 24px 0; font-size: 13px; color: #999; line-height: 1.6;'>
+        <div class='home-scenario-card' onclick="document.querySelector('[data-scenario=3]').click();" style='cursor: pointer;'>
+            <div style='font-size: 56px; text-align: center; margin-bottom: 16px;'>📱</div>
+            <h3 style='text-align: center; margin: 0 0 6px 0; font-size: 18px; color: #333; font-weight: 600;'>意志荒漠</h3>
+            <p style='text-align: center; margin: 0 0 12px 0; font-size: 13px; color: #999;'>想放弃去刷视频</p>
+            <p style='text-align: center; margin: 0 0 20px 0; font-size: 12px; color: #aaa; line-height: 1.5;'>
                 学习动力消退，诱惑不断增加，坚持变得困难...
             </p>
             <div style='text-align: center;'>
-                <a href='#' style='color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500;'>进入此场景 →</a>
+                <span style='color: #667eea; font-size: 13px; font-weight: 500;'>进入此场景 →</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入意志荒漠", key="btn_scenario_3", width="stretch", use_container_width=True):
+        if st.button("进入意志荒漠", key="btn_scenario_3", width="stretch", use_container_width=True, label_visibility="collapsed"):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "意志荒漠"
             st.session_state.dialogue_history = []

@@ -814,164 +814,102 @@ def render_dialogue_page():
 
     st.markdown("---")
 
-    # 左右两列布局
-    col_left, col_right = st.columns([1, 1.2], gap="large")
+    # ========== 对话框 ==========
+    st.markdown("#### 💬 深度对话")
 
-    # ========== 左侧：雷达图 + 语义透视窗 ==========
-    with col_left:
-        st.markdown("#### 📊 学习心理维度")
+    # 对话历史显示 - 微信风格
+    st.markdown("""
+    <div class='chat-container'>
+    """, unsafe_allow_html=True)
 
-        # 创建并显示雷达图
-        fig = create_radar_chart(st.session_state.current_scores)
-        st.plotly_chart(fig, width="stretch", key=f"radar_{st.session_state.round_count}")
-
-        # 语义透视窗
-        if st.session_state.semantic_log:
+    for msg in st.session_state.dialogue_history:
+        if msg["role"] == "user":
+            # 用户消息（右对齐）
             st.markdown(f"""
-            <div class='semantic-window'>
-                🔍 {st.session_state.semantic_log}
-            </div>
-            """, unsafe_allow_html=True)
-
-        # 分值显示 - 两行紧凑布局
-        st.markdown("#### 📈 维度分值")
-
-        # 第一行：前两个维度
-        score_cols1 = st.columns(2, gap="small")
-        dimensions = list(st.session_state.current_scores.keys())
-
-        with score_cols1[0]:
-            st.markdown(f"""
-            <div class='score-card'>
-                <div class='score-card-label'>{dimensions[0]}</div>
-                <div class='score-card-value'>{st.session_state.current_scores[dimensions[0]]}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with score_cols1[1]:
-            st.markdown(f"""
-            <div class='score-card'>
-                <div class='score-card-label'>{dimensions[1]}</div>
-                <div class='score-card-value'>{st.session_state.current_scores[dimensions[1]]}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # 第二行：后两个维度
-        score_cols2 = st.columns(2, gap="small")
-
-        with score_cols2[0]:
-            st.markdown(f"""
-            <div class='score-card'>
-                <div class='score-card-label'>{dimensions[2]}</div>
-                <div class='score-card-value'>{st.session_state.current_scores[dimensions[2]]}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with score_cols2[1]:
-            st.markdown(f"""
-            <div class='score-card'>
-                <div class='score-card-label'>{dimensions[3]}</div>
-                <div class='score-card-value'>{st.session_state.current_scores[dimensions[3]]}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    # ========== 右侧：对话框 ==========
-    with col_right:
-        st.markdown("#### 💬 深度对话")
-
-        # 对话历史显示 - 微信风格
-        st.markdown("""
-        <div class='chat-container'>
-        """, unsafe_allow_html=True)
-
-        for msg in st.session_state.dialogue_history:
-            if msg["role"] == "user":
-                # 用户消息（右对齐）
-                st.markdown(f"""
-                <div class='chat-message chat-message-user'>
-                    <div class='chat-content chat-content-user'>
-                        <div class='chat-bubble chat-bubble-user'>
-                            {msg["content"]}
-                        </div>
+            <div class='chat-message chat-message-user'>
+                <div class='chat-content chat-content-user'>
+                    <div class='chat-bubble chat-bubble-user'>
+                        {msg["content"]}
                     </div>
-                    <div class='chat-avatar'>👤</div>
                 </div>
-                """, unsafe_allow_html=True)
+                <div class='chat-avatar'>👤</div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            # AI 消息（左对齐）
+            st.markdown(f"""
+            <div class='chat-message chat-message-ai'>
+                <div class='chat-avatar'>🧠</div>
+                <div class='chat-content chat-content-ai'>
+                    <div class='chat-bubble chat-bubble-ai'>
+                        {msg["content"]}
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # 用户输入
+    st.markdown("---")
+    user_input = st.text_area(
+        "你的回答：",
+        placeholder="请详细描述你的想法和感受...",
+        height=90,
+        label_visibility="collapsed"
+    )
+
+    # 提交按钮
+    col_btn1, col_btn2 = st.columns([1.2, 1])
+
+    with col_btn1:
+        if st.button("📤 提交回答", width="stretch"):
+            if not user_input.strip():
+                st.warning("⚠️ 请输入你的回答")
+            elif len(user_input.strip()) < 5:
+                # 智能追问逻辑
+                st.info("💡 你的回答有点简短，能否详细一些呢？")
             else:
-                # AI 消息（左对齐）
-                st.markdown(f"""
-                <div class='chat-message chat-message-ai'>
-                    <div class='chat-avatar'>🧠</div>
-                    <div class='chat-content chat-content-ai'>
-                        <div class='chat-bubble chat-bubble-ai'>
-                            {msg["content"]}
-                        </div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                # 添加用户消息
+                st.session_state.dialogue_history.append({
+                    "role": "user",
+                    "content": user_input
+                })
 
-        st.markdown("</div>", unsafe_allow_html=True)
+                # 调用 AI（模拟）
+                st.session_state.round_count += 1
+                ai_response = simulate_ai_response(
+                    user_input,
+                    st.session_state.scenario,
+                    st.session_state.round_count,
+                    is_init=False
+                )
 
-        # 用户输入
-        st.markdown("---")
-        user_input = st.text_area(
-            "你的回答：",
-            placeholder="请详细描述你的想法和感受...",
-            height=90,
-            label_visibility="collapsed"
-        )
+                # 解析 AI 响应
+                dialogue, scores, is_finished, semantic_log = parse_ai_response(ai_response)
 
-        # 提交按钮
-        col_btn1, col_btn2 = st.columns([1.2, 1])
+                # 更新状态
+                st.session_state.dialogue_history.append({
+                    "role": "assistant",
+                    "content": dialogue
+                })
+                st.session_state.current_scores = scores
+                st.session_state.scores_history.append(scores)
+                st.session_state.semantic_log = semantic_log
 
-        with col_btn1:
-            if st.button("📤 提交回答", width="stretch"):
-                if not user_input.strip():
-                    st.warning("⚠️ 请输入你的回答")
-                elif len(user_input.strip()) < 5:
-                    # 智能追问逻辑
-                    st.info("💡 你的回答有点简短，能否详细一些呢？")
-                else:
-                    # 添加用户消息
-                    st.session_state.dialogue_history.append({
-                        "role": "user",
-                        "content": user_input
-                    })
+                # 如果完成 3 个问题，标记为完成
+                if st.session_state.round_count >= 3:
+                    st.session_state.is_finished = True
 
-                    # 调用 AI（模拟）
-                    st.session_state.round_count += 1
-                    ai_response = simulate_ai_response(
-                        user_input,
-                        st.session_state.scenario,
-                        st.session_state.round_count,
-                        is_init=False
-                    )
-
-                    # 解析 AI 响应
-                    dialogue, scores, is_finished, semantic_log = parse_ai_response(ai_response)
-
-                    # 更新状态
-                    st.session_state.dialogue_history.append({
-                        "role": "assistant",
-                        "content": dialogue
-                    })
-                    st.session_state.current_scores = scores
-                    st.session_state.scores_history.append(scores)
-                    st.session_state.semantic_log = semantic_log
-
-                    # 如果完成 3 个问题，标记为完成
-                    if st.session_state.round_count >= 3:
-                        st.session_state.is_finished = True
-
-                    st.rerun()
-
-        with col_btn2:
-            if st.button("🏠 返回", width="stretch"):
-                st.session_state.page = "home"
                 st.rerun()
 
-        # 生成报告按钮（3 个问题完成后显示）
-        if st.session_state.round_count >= 3:
+    with col_btn2:
+        if st.button("🏠 返回", width="stretch"):
+            st.session_state.page = "home"
+            st.rerun()
+
+    # 生成报告按钮（3 个问题完成后显示）
+    if st.session_state.round_count >= 3:
             st.markdown("---")
             st.success("✅ 诊断完成！现在可以查看你的心理诊断报告。")
             if st.button("📋 生成深度透视报告", width="stretch", type="primary"):

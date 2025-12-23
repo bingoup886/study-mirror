@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional
 import re
+import requests
 
 # ============================================================================
 # 页面配置
@@ -340,7 +341,46 @@ SCENARIOS = {
 }
 
 # ============================================================================
-# AI 模拟函数（用于演示，后续替换为真实 API）
+# 硅基流动 API 配置
+# ============================================================================
+SILICONFLOW_API_KEY = "sk-kvkkpoisfmvkumunkdfnlungbsenuzcvgxpreqasamasefcp"
+SILICONFLOW_API_URL = "https://api.siliconflow.cn/v1/chat/completions"
+MODEL_NAME = "deepseek-ai/DeepSeek-V3"
+
+# ============================================================================
+# 调用硅基流动 API
+# ============================================================================
+def call_deepseek_api(prompt: str) -> str:
+    """
+    调用硅基流动的 DeepSeek-V3 模型
+    """
+    try:
+        headers = {
+            "Authorization": f"Bearer {SILICONFLOW_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "model": MODEL_NAME,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.7,
+            "max_tokens": 1000,
+            "top_p": 0.9
+        }
+
+        response = requests.post(SILICONFLOW_API_URL, json=payload, headers=headers, timeout=30)
+        response.raise_for_status()
+
+        result = response.json()
+        return result["choices"][0]["message"]["content"]
+    except Exception as e:
+        st.error(f"API 调用失败: {str(e)}")
+        return ""
+
+# ============================================================================
+# AI 响应函数（使用真实 API）
 # ============================================================================
 def simulate_ai_response(user_input: str, scenario: str, round_num: int, is_init: bool = False) -> Dict:
     """
@@ -419,23 +459,33 @@ def simulate_ai_response(user_input: str, scenario: str, round_num: int, is_init
     # 如果是初始化，返回欢迎语 + 第一个问题
     if is_init:
         welcome = welcome_messages.get(scenario, "你好，我是你的心理咨询师。")
-        first_question = scenario_responses[0]
+        # 使用 API 生成第一个问题
+        prompt = f"你是一位专业的心理咨询师。用户选择了'{scenario}'场景。请生成一个开放式的心理咨询问题，帮助用户探索他们的心理状态。问题应该简洁、同情、专业。只返回问题本身，不要有其他内容。"
+        first_question = call_deepseek_api(prompt)
+        if not first_question:
+            first_question = scenario_responses[0]
         dialogue = f"{welcome}\n\n{first_question}"
         is_finished = False
         question_count = 1
     else:
-        # 根据问题计数获取对应的问题
-        question_idx = min(round_num, len(scenario_responses) - 1)
-        dialogue = scenario_responses[question_idx]
-
         # 3 个问题完成后，开始分析
         if round_num >= 3:
             is_finished = True
-            # 添加分析总结
-            summary = analysis_summary.get(scenario, "")
+            # 使用 API 生成分析总结
+            prompt = f"用户在'{scenario}'场景中完成了3轮心理咨询对话。用户的回答显示了他们的心理状态。请生成一个专业的、鼓励性的分析总结（2-3句话），评价用户的心理状态和成长潜力。"
+            summary = call_deepseek_api(prompt)
+            if not summary:
+                summary = analysis_summary.get(scenario, "")
             dialogue = f"{summary}\n\n现在让我为你生成详细的心理诊断报告..."
         else:
             is_finished = False
+            # 使用 API 生成下一个问题
+            prompt = f"你是一位专业的心理咨询师。用户在'{scenario}'场景中。用户之前的回答是：'{user_input}'。这是第{round_num + 1}个问题。请生成一个后续的心理咨询问题，深入探索用户的心理状态。问题应该基于用户的回答，更深入地了解他们的想法和感受。只返回问题本身，不要有其他内容。"
+            dialogue = call_deepseek_api(prompt)
+            if not dialogue:
+                # 如果 API 调用失败，使用预设的问题
+                question_idx = min(round_num, len(scenario_responses) - 1)
+                dialogue = scenario_responses[question_idx]
 
         question_count = round_num + 1
 

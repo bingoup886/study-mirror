@@ -212,6 +212,12 @@ def init_session_state():
     if "semantic_log" not in st.session_state:
         st.session_state.semantic_log = ""
 
+    if "initialized" not in st.session_state:
+        st.session_state.initialized = False
+
+    if "question_count" not in st.session_state:
+        st.session_state.question_count = 0
+
 init_session_state()
 
 # ============================================================================
@@ -262,32 +268,49 @@ SCENARIOS = {
 # ============================================================================
 # AI 模拟函数（用于演示，后续替换为真实 API）
 # ============================================================================
-def simulate_ai_response(user_input: str, scenario: str, round_num: int) -> Dict:
+def simulate_ai_response(user_input: str, scenario: str, round_num: int, is_init: bool = False) -> Dict:
     """
     模拟 AI 返回结构化数据
     实际应用中，这里会调用九章/GPT-4o API
+
+    参数：
+    - user_input: 用户输入
+    - scenario: 场景名称
+    - round_num: 轮数
+    - is_init: 是否是初始化（生成欢迎语和第一个问题）
     """
 
-    # 模拟 AI 的对话回复
+    # 欢迎语
+    welcome_messages = {
+        "失意之径": "你好，我是你的心理咨询师。我看到你最近经历了一次考试失利，我能理解这种失望的感受。让我们一起来探索一下你的想法和感受。",
+        "深谷挑战": "你好，我是你的心理咨询师。我看到你在深夜做题时遇到了困难，这确实是一个挑战。让我们一起来理解你现在的状态。",
+        "意志荒漠": "你好，我是你的心理咨询师。我看到你现在感到疲惫，想要放弃学习。这是很多学生都会经历的感受。让我们一起来探索一下。"
+    }
+
+    # 模拟 AI 的对话回复（3 个问题）
     responses = {
         "失意之径": [
             "我能感受到你现在的失落。考试没有达到预期，这确实让人难受。能告诉我，你在准备这次考试时，花了多少时间复习？",
-            "感谢你的分享。我注意到你提到了'尽力了'。那么，你觉得这次失利主要是因为什么呢？是知识掌握不够，还是考试时的状态问题？",
-            "我理解。这种感受很常见。现在让我问你一个不同的角度：如果下次考试前，你能改变一件事，你会改变什么？",
-            "很好的思考。你的这个想法表明你已经在反思和成长。最后一个问题：你觉得自己有能力在下次考试中做得更好吗？"
+            "感谢你的分享。我注意到你提到了这些。那么，你觉得这次失利主要是因为什么呢？是知识掌握不够，还是考试时的状态问题？",
+            "我理解。这种感受很常见。现在让我问你一个不同的角度：如果下次考试前，你能改变一件事，你会改变什么？"
         ],
         "深谷挑战": [
             "深夜做题遇到难题，这种感受我理解。能描述一下这道题的难点在哪里吗？",
             "感谢分享。那么，当你遇到这样的难题时，你通常会怎么处理？",
-            "我看到了。你的这个方法很有思考。那么，你觉得自己有能力解决这类问题吗？",
-            "很好。你的坚持精神值得肯定。现在，你觉得继续做题还是先休息会更有帮助？"
+            "我看到了。你的这个方法很有思考。那么，你觉得自己有能力解决这类问题吗？"
         ],
         "意志荒漠": [
             "我能感受到你的疲惫。学习到一定程度确实会感到乏力。能告诉我，你现在最想放弃的原因是什么？",
             "感谢你的坦诚。那么，你觉得学习对你来说意味着什么呢？",
-            "我理解。那么，如果你坚持下去，你期待会得到什么？",
-            "很好的思考。你的这个想法表明你内心还是有目标的。你觉得自己有能力坚持下去吗？"
+            "我理解。那么，如果你坚持下去，你期待会得到什么？"
         ]
+    }
+
+    # 分析总结（3 个问题后）
+    analysis_summary = {
+        "失意之径": "通过我们的对话，我看到了你的反思能力和成长潜力。你对失败的理解正在逐步深化，这是非常积极的信号。",
+        "深谷挑战": "你展现出了很强的问题解决意识和坚持精神。即使在困难面前，你也在思考如何应对，这说明你的元认知能力很强。",
+        "意志荒漠": "你的对话让我看到，你内心其实还是有目标和动力的。疲惫是暂时的，而你的坚持能力是真实存在的。"
     }
 
     # 模拟 AI 的评分逻辑（0-100 分）
@@ -318,7 +341,29 @@ def simulate_ai_response(user_input: str, scenario: str, round_num: int) -> Dict
 
     # 获取对应的对话
     scenario_responses = responses.get(scenario, responses["失意之径"])
-    dialogue = scenario_responses[min(round_num - 1, len(scenario_responses) - 1)]
+
+    # 如果是初始化，返回欢迎语 + 第一个问题
+    if is_init:
+        welcome = welcome_messages.get(scenario, "你好，我是你的心理咨询师。")
+        first_question = scenario_responses[0]
+        dialogue = f"{welcome}\n\n{first_question}"
+        is_finished = False
+        question_count = 1
+    else:
+        # 根据问题计数获取对应的问题
+        question_idx = min(round_num, len(scenario_responses) - 1)
+        dialogue = scenario_responses[question_idx]
+
+        # 3 个问题完成后，开始分析
+        if round_num >= 3:
+            is_finished = True
+            # 添加分析总结
+            summary = analysis_summary.get(scenario, "")
+            dialogue = f"{summary}\n\n现在让我为你生成详细的心理诊断报告..."
+        else:
+            is_finished = False
+
+        question_count = round_num + 1
 
     # 模拟语义透视
     semantic_keywords = {
@@ -333,7 +378,7 @@ def simulate_ai_response(user_input: str, scenario: str, round_num: int) -> Dict
     return {
         "dialogue": dialogue,
         "scores": base_scores,
-        "is_finished": round_num >= 4,
+        "is_finished": is_finished,
         "analysis_log": semantic_log
     }
 
@@ -447,6 +492,8 @@ def render_home_page():
             st.session_state.dialogue_history = []
             st.session_state.scores_history = []
             st.session_state.round_count = 0
+            st.session_state.question_count = 0
+            st.session_state.initialized = False
             st.rerun()
 
     with col2:
@@ -468,6 +515,8 @@ def render_home_page():
             st.session_state.dialogue_history = []
             st.session_state.scores_history = []
             st.session_state.round_count = 0
+            st.session_state.question_count = 0
+            st.session_state.initialized = False
             st.rerun()
 
     with col3:
@@ -489,6 +538,8 @@ def render_home_page():
             st.session_state.dialogue_history = []
             st.session_state.scores_history = []
             st.session_state.round_count = 0
+            st.session_state.question_count = 0
+            st.session_state.initialized = False
             st.rerun()
 
 # ============================================================================
@@ -496,6 +547,29 @@ def render_home_page():
 # ============================================================================
 def render_dialogue_page():
     """渲染对话页面 - 左图右谈"""
+
+    # ========== 初始化：发送欢迎语和第一个问题 ==========
+    if not st.session_state.initialized:
+        ai_response = simulate_ai_response(
+            user_input="",
+            scenario=st.session_state.scenario,
+            round_num=0,
+            is_init=True
+        )
+
+        dialogue, scores, is_finished, semantic_log = parse_ai_response(ai_response)
+
+        # 添加 AI 的欢迎语和第一个问题
+        st.session_state.dialogue_history.append({
+            "role": "assistant",
+            "content": dialogue
+        })
+
+        # 更新状态
+        st.session_state.current_scores = scores
+        st.session_state.semantic_log = semantic_log
+        st.session_state.initialized = True
+        st.session_state.question_count = 1
 
     # 顶部导航栏
     nav_col1, nav_col2, nav_col3 = st.columns([1, 2, 1])
@@ -640,7 +714,8 @@ def render_dialogue_page():
                     ai_response = simulate_ai_response(
                         user_input,
                         st.session_state.scenario,
-                        st.session_state.round_count
+                        st.session_state.round_count,
+                        is_init=False
                     )
 
                     # 解析 AI 响应
@@ -655,6 +730,10 @@ def render_dialogue_page():
                     st.session_state.scores_history.append(scores)
                     st.session_state.semantic_log = semantic_log
 
+                    # 如果完成 3 个问题，标记为完成
+                    if st.session_state.round_count >= 3:
+                        st.session_state.is_finished = True
+
                     st.rerun()
 
         with col_btn2:
@@ -662,9 +741,10 @@ def render_dialogue_page():
                 st.session_state.page = "home"
                 st.rerun()
 
-        # 生成报告按钮
-        if st.session_state.round_count >= 4 or (st.session_state.dialogue_history and st.session_state.dialogue_history[-1].get("is_finished")):
+        # 生成报告按钮（3 个问题完成后显示）
+        if st.session_state.round_count >= 3:
             st.markdown("---")
+            st.success("✅ 诊断完成！现在可以查看你的心理诊断报告。")
             if st.button("📋 生成深度透视报告", width="stretch", type="primary"):
                 st.session_state.page = "report"
                 st.rerun()

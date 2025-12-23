@@ -30,39 +30,95 @@ st.markdown("""
         margin: 0 auto !important;
     }
 
-    /* ===== 对话气泡 - 优化版 ===== */
-    .chat-bubble-ai {
-        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    /* ===== 对话气泡 - 微信风格 ===== */
+
+    /* 对话消息行 */
+    .chat-message {
+        display: flex;
+        margin: 12px 0;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    /* AI 消息（左对齐） */
+    .chat-message-ai {
+        justify-content: flex-start;
+    }
+
+    /* 用户消息（右对齐） */
+    .chat-message-user {
+        justify-content: flex-end;
+    }
+
+    /* 头像 */
+    .chat-avatar {
+        font-size: 24px;
+        min-width: 32px;
+        text-align: center;
+    }
+
+    /* 消息内容容器 */
+    .chat-content {
+        max-width: 70%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* AI 消息内容 */
+    .chat-content-ai {
+        align-items: flex-start;
+    }
+
+    /* 用户消息内容 */
+    .chat-content-user {
+        align-items: flex-end;
+    }
+
+    /* 气泡样式 */
+    .chat-bubble {
         border-radius: 16px;
-        padding: 14px 18px;
-        margin: 10px 0;
-        border: 1px solid rgba(63, 81, 181, 0.2);
-        box-shadow: 0 2px 8px rgba(63, 81, 181, 0.1);
+        padding: 12px 16px;
+        word-wrap: break-word;
         font-size: 14px;
         line-height: 1.6;
         color: #333;
     }
 
+    /* AI 气泡 */
+    .chat-bubble-ai {
+        background: #f0f0f0;
+        border-radius: 16px 16px 16px 4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 用户气泡 */
+    .chat-bubble-user {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px 16px 4px 16px;
+        color: white;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    /* 用户气泡中的文字 */
+    .chat-bubble-user strong {
+        color: white;
+        font-weight: 600;
+        display: none;
+    }
+
+    /* AI 气泡中的文字 */
     .chat-bubble-ai strong {
         color: #3f51b5;
         font-weight: 600;
+        display: none;
     }
 
-    .chat-bubble-user {
-        background: linear-gradient(135deg, #c8e6c9 0%, #e8f5e9 100%);
-        border-radius: 16px;
-        padding: 14px 18px;
-        margin: 10px 0;
-        border: 1px solid rgba(76, 175, 80, 0.2);
-        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);
-        font-size: 14px;
-        line-height: 1.6;
-        color: #333;
-    }
-
-    .chat-bubble-user strong {
-        color: #4caf50;
-        font-weight: 600;
+    /* 时间戳 */
+    .chat-timestamp {
+        font-size: 12px;
+        color: #999;
+        margin-top: 4px;
+        text-align: center;
     }
 
     /* 对话容器 */
@@ -662,22 +718,34 @@ def render_dialogue_page():
     with col_right:
         st.markdown("#### 💬 深度对话")
 
-        # 对话历史显示 - 使用容器
+        # 对话历史显示 - 微信风格
         st.markdown("""
         <div class='chat-container'>
         """, unsafe_allow_html=True)
 
         for msg in st.session_state.dialogue_history:
             if msg["role"] == "user":
+                # 用户消息（右对齐）
                 st.markdown(f"""
-                <div class='chat-bubble-user'>
-                    <strong>👤 你：</strong> {msg["content"]}
+                <div class='chat-message chat-message-user'>
+                    <div class='chat-content chat-content-user'>
+                        <div class='chat-bubble chat-bubble-user'>
+                            {msg["content"]}
+                        </div>
+                    </div>
+                    <div class='chat-avatar'>👤</div>
                 </div>
                 """, unsafe_allow_html=True)
             else:
+                # AI 消息（左对齐）
                 st.markdown(f"""
-                <div class='chat-bubble-ai'>
-                    <strong>🧠 心理咨询师：</strong> {msg["content"]}
+                <div class='chat-message chat-message-ai'>
+                    <div class='chat-avatar'>🧠</div>
+                    <div class='chat-content chat-content-ai'>
+                        <div class='chat-bubble chat-bubble-ai'>
+                            {msg["content"]}
+                        </div>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
 

@@ -350,34 +350,87 @@ MODEL_NAME = "deepseek-ai/DeepSeek-V3"
 # ============================================================================
 # 调用硅基流动 API
 # ============================================================================
-def call_deepseek_api(prompt: str) -> str:
+def call_deepseek_api(prompt: str, max_retries: int = 2) -> str:
     """
-    调用硅基流动的 DeepSeek-V3 模型
+    调用硅基流动的 DeepSeek-V3 模型，参考官方 API 调用示例
     """
-    try:
-        headers = {
-            "Authorization": f"Bearer {SILICONFLOW_API_KEY}",
-            "Content-Type": "application/json"
-        }
+    import time
 
-        payload = {
-            "model": MODEL_NAME,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.7,
-            "max_tokens": 1000,
-            "top_p": 0.9
-        }
+    for attempt in range(max_retries):
+        try:
+            headers = {
+                "Authorization": f"Bearer {SILICONFLOW_API_KEY}",
+                "Content-Type": "application/json"
+            }
 
-        response = requests.post(SILICONFLOW_API_URL, json=payload, headers=headers, timeout=30)
-        response.raise_for_status()
+            payload = {
+                "model": MODEL_NAME,
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ],
+                "stream": False,
+                "max_tokens": 1000,
+                "temperature": 0.7,
+                "top_p": 0.7,
+                "top_k": 50,
+                "frequency_penalty": 0.5,
+                "n": 1,
+                "response_format": {"type": "text"}
+            }
 
-        result = response.json()
-        return result["choices"][0]["message"]["content"]
-    except Exception as e:
-        st.error(f"API 调用失败: {str(e)}")
-        return ""
+            response = requests.post(SILICONFLOW_API_URL, json=payload, headers=headers, timeout=30)
+            response.raise_for_status()
+
+            result = response.json()
+            if "choices" in result and len(result["choices"]) > 0:
+                return result["choices"][0]["message"]["content"]
+            else:
+                return ""
+
+        except requests.exceptions.Timeout:
+            if attempt < max_retries - 1:
+                time.sleep(2)
+                continue
+            else:
+                st.warning("⚠️ API 请求超时，使用预设回复")
+                return ""
+        except requests.exceptions.ConnectionError:
+            if attempt < max_retries - 1:
+                time.sleep(2)
+                continue
+            else:
+                st.warning("⚠️ 网络连接失败，使用预设回复")
+                return ""
+        except requests.exceptions.HTTPError as e:
+            error_code = e.response.status_code
+
+            if error_code == 503:
+                if attempt < max_retries - 1:
+                    st.info("⏳ API 服务暂时不可用，正在重试...")
+                    time.sleep(3)
+                    continue
+                else:
+                    st.warning("⚠️ API 服务暂时不可用，使用预设回复")
+                    return ""
+            elif error_code == 401:
+                st.error("❌ API 认证失败：请检查 API Key 是否正确")
+                return ""
+            elif error_code == 429:
+                if attempt < max_retries - 1:
+                    st.info("⏳ API 请求过于频繁，正在重试...")
+                    time.sleep(5)
+                    continue
+                else:
+                    st.warning("⚠️ API 请求过于频繁，使用预设回复")
+                    return ""
+            else:
+                st.warning(f"⚠️ API 错误 (HTTP {error_code})，使用预设回复")
+                return ""
+        except Exception as e:
+            st.warning(f"⚠️ API 调用异常，使用预设回复")
+            return ""
+
+    return ""
 
 # ============================================================================
 # AI 响应函数（使用真实 API）

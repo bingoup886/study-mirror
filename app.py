@@ -147,6 +147,24 @@ st.markdown("""
         box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
 
+    /* 首页场景卡片 */
+    .home-scenario-card {
+        background: white;
+        border-radius: 12px;
+        padding: 32px 24px;
+        border: 1px solid #f0f0f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .home-scenario-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-color: #e8e8e8;
+    }
+
     /* 语义透视窗 - 优化版 */
     .semantic-window {
         font-size: 13px;
@@ -510,39 +528,70 @@ def create_radar_chart(scores: Dict) -> go.Figure:
 # 首页：三扇门场景选择
 # ============================================================================
 def render_home_page():
-    """渲染首页 - 三扇门"""
-    st.markdown("""
-    <div style='text-align: center; padding: 40px 0;'>
-        <h1 style='font-size: 48px; margin-bottom: 10px;'>🧠 学习心理诊断工具</h1>
-        <p style='font-size: 18px; color: #666;'>通过深度对话，发现你的学习心理密码</p>
-    </div>
-    """, unsafe_allow_html=True)
+    """渲染首页 - 按照设计图一比一实现"""
 
-    st.markdown("---")
+    # 顶部导航栏
+    nav_col1, nav_col2, nav_col3 = st.columns([1, 3, 1])
+    with nav_col1:
+        st.markdown("""
+        <div style='font-size: 24px; font-weight: bold; color: #ff6b6b;'>❤️</div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div style='text-align: center; margin: 30px 0;'>
-        <h3>选择你的场景，开启诊断之旅</h3>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # 三列布局
-    col1, col2, col3 = st.columns(3, gap="large")
-
-    with col1:
-        st.markdown(f"""
-        <div class='scenario-card'>
-            <div style='font-size: 48px; text-align: center; margin-bottom: 16px;'>
-                {SCENARIOS["失意之径"]["emoji"]}
-            </div>
-            <h3 style='text-align: center; margin: 0;'>{SCENARIOS["失意之径"]["title"]}</h3>
-            <p style='text-align: center; color: #666; margin: 8px 0;'>
-                {SCENARIOS["失意之径"]["description"]}
-            </p>
+    with nav_col2:
+        st.markdown("""
+        <div style='text-align: left;'>
+            <div style='font-size: 18px; font-weight: bold; color: #333;'>心理透镜</div>
+            <div style='font-size: 12px; color: #999;'>Psyche Lens</div>
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入失意之径", key="btn_scenario_1", width="stretch"):
+    with nav_col3:
+        st.markdown("""
+        <div style='text-align: right; font-size: 14px; color: #666;'>
+            欢迎，ding &nbsp; <span style='color: #ff6b6b;'>➜</span> &nbsp; 登出
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # 主标题
+    st.markdown("""
+    <div style='text-align: center; padding: 40px 0 20px 0;'>
+        <h1 style='font-size: 42px; margin: 0; color: #333;'>
+            选择你的<span style='color: #ff6b6b;'>心境场景</span>
+        </h1>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 副标题
+    st.markdown("""
+    <div style='text-align: center; margin-bottom: 50px;'>
+        <p style='font-size: 16px; color: #666; margin: 0;'>
+            通过 3-5 轮温暖对话，我们将深入理解你的学习心理状态
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 三列布局 - 场景卡片
+    col1, col2, col3 = st.columns(3, gap="large")
+
+    # 场景 1：失意之径
+    with col1:
+        st.markdown("""
+        <div class='home-scenario-card'>
+            <div style='font-size: 64px; text-align: center; margin-bottom: 20px;'>😔</div>
+            <h3 style='text-align: center; margin: 0 0 8px 0; font-size: 20px; color: #333;'>失意之径</h3>
+            <p style='text-align: center; margin: 0 0 12px 0; font-size: 14px; color: #999;'>努力后却考砸了</p>
+            <p style='text-align: center; margin: 0 0 24px 0; font-size: 13px; color: #999; line-height: 1.6;'>
+                当付出努力后却未获得预期成果，内心的失落与困惑油然而生...
+            </p>
+            <div style='text-align: center;'>
+                <a href='#' style='color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500;'>进入此场景 →</a>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if st.button("进入失意之径", key="btn_scenario_1", width="stretch", use_container_width=True):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "失意之径"
             st.session_state.dialogue_history = []
@@ -552,20 +601,23 @@ def render_home_page():
             st.session_state.initialized = False
             st.rerun()
 
+    # 场景 2：深谷挑战
     with col2:
-        st.markdown(f"""
-        <div class='scenario-card'>
-            <div style='font-size: 48px; text-align: center; margin-bottom: 16px;'>
-                {SCENARIOS["深谷挑战"]["emoji"]}
-            </div>
-            <h3 style='text-align: center; margin: 0;'>{SCENARIOS["深谷挑战"]["title"]}</h3>
-            <p style='text-align: center; color: #666; margin: 8px 0;'>
-                {SCENARIOS["深谷挑战"]["description"]}
+        st.markdown("""
+        <div class='home-scenario-card'>
+            <div style='font-size: 64px; text-align: center; margin-bottom: 20px;'>🤔</div>
+            <h3 style='text-align: center; margin: 0 0 8px 0; font-size: 20px; color: #333;'>深谷挑战</h3>
+            <p style='text-align: center; margin: 0 0 12px 0; font-size: 14px; color: #999;'>深夜遇难题卡住</p>
+            <p style='text-align: center; margin: 0 0 24px 0; font-size: 13px; color: #999; line-height: 1.6;'>
+                面对困难题目，感到无助和困顿，思维陷入僵局...
             </p>
+            <div style='text-align: center;'>
+                <a href='#' style='color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500;'>进入此场景 →</a>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入深谷挑战", key="btn_scenario_2", width="stretch"):
+        if st.button("进入深谷挑战", key="btn_scenario_2", width="stretch", use_container_width=True):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "深谷挑战"
             st.session_state.dialogue_history = []
@@ -575,20 +627,23 @@ def render_home_page():
             st.session_state.initialized = False
             st.rerun()
 
+    # 场景 3：意志荒漠
     with col3:
-        st.markdown(f"""
-        <div class='scenario-card'>
-            <div style='font-size: 48px; text-align: center; margin-bottom: 16px;'>
-                {SCENARIOS["意志荒漠"]["emoji"]}
-            </div>
-            <h3 style='text-align: center; margin: 0;'>{SCENARIOS["意志荒漠"]["title"]}</h3>
-            <p style='text-align: center; color: #666; margin: 8px 0;'>
-                {SCENARIOS["意志荒漠"]["description"]}
+        st.markdown("""
+        <div class='home-scenario-card'>
+            <div style='font-size: 64px; text-align: center; margin-bottom: 20px;'>📱</div>
+            <h3 style='text-align: center; margin: 0 0 8px 0; font-size: 20px; color: #333;'>意志荒漠</h3>
+            <p style='text-align: center; margin: 0 0 12px 0; font-size: 14px; color: #999;'>想放弃去刷视频</p>
+            <p style='text-align: center; margin: 0 0 24px 0; font-size: 13px; color: #999; line-height: 1.6;'>
+                学习动力消退，诱惑不断增加，坚持变得困难...
             </p>
+            <div style='text-align: center;'>
+                <a href='#' style='color: #667eea; text-decoration: none; font-size: 14px; font-weight: 500;'>进入此场景 →</a>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("进入意志荒漠", key="btn_scenario_3", width="stretch"):
+        if st.button("进入意志荒漠", key="btn_scenario_3", width="stretch", use_container_width=True):
             st.session_state.page = "dialogue"
             st.session_state.scenario = "意志荒漠"
             st.session_state.dialogue_history = []
@@ -597,6 +652,36 @@ def render_home_page():
             st.session_state.question_count = 0
             st.session_state.initialized = False
             st.rerun()
+
+    # 底部 - 四个核心维度
+    st.markdown("""
+    <div style='margin-top: 80px; padding: 40px 0;'>
+        <div style='text-align: center; margin-bottom: 40px;'>
+            <h2 style='font-size: 24px; color: #333; margin: 0;'>
+                我们将评估<span style='color: #ff6b6b;'>四个核心维度</span>
+            </h2>
+        </div>
+
+        <div style='display: flex; justify-content: center; gap: 60px; flex-wrap: wrap;'>
+            <div style='text-align: center;'>
+                <div style='font-size: 16px; font-weight: 600; color: #ff6b6b; margin-bottom: 8px;'>归因风格</div>
+                <div style='font-size: 13px; color: #999;'>如何解释失败</div>
+            </div>
+            <div style='text-align: center;'>
+                <div style='font-size: 16px; font-weight: 600; color: #52c41a; margin-bottom: 8px;'>自我效能感</div>
+                <div style='font-size: 13px; color: #999;'>对自己的信心</div>
+            </div>
+            <div style='text-align: center;'>
+                <div style='font-size: 16px; font-weight: 600; color: #faad14; margin-bottom: 8px;'>认知负荷</div>
+                <div style='font-size: 13px; color: #999;'>心理压力程度</div>
+            </div>
+            <div style='text-align: center;'>
+                <div style='font-size: 16px; font-weight: 600; color: #1890ff; margin-bottom: 8px;'>元认知</div>
+                <div style='font-size: 13px; color: #999;'>学习意识能力</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================================
 # 对话页面：左图右谈

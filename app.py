@@ -654,50 +654,32 @@ def render_home_page():
             st.rerun()
 
     # 底部 - 四个核心维度
-    st.markdown("<div style='margin-top: 80px; padding: 40px 0;'></div>", unsafe_allow_html=True)
-
     st.markdown("""
-    <div style='text-align: center; margin-bottom: 40px;'>
-        <h2 style='font-size: 24px; color: #333; margin: 0;'>
+    <div style='margin-top: 60px; padding: 32px 40px; background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); border-radius: 12px; text-align: center;'>
+        <h2 style='font-size: 22px; color: #333; margin: 0 0 24px 0;'>
             我们将评估<span style='color: #ff6b6b;'>四个核心维度</span>
         </h2>
+
+        <div style='display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;'>
+            <div style='text-align: center; min-width: 100px;'>
+                <div style='font-size: 15px; font-weight: 600; color: #ff6b6b; margin-bottom: 6px;'>归因风格</div>
+                <div style='font-size: 12px; color: #666; line-height: 1.4;'>如何解释失败</div>
+            </div>
+            <div style='text-align: center; min-width: 100px;'>
+                <div style='font-size: 15px; font-weight: 600; color: #52c41a; margin-bottom: 6px;'>自我效能感</div>
+                <div style='font-size: 12px; color: #666; line-height: 1.4;'>对自己的信心</div>
+            </div>
+            <div style='text-align: center; min-width: 100px;'>
+                <div style='font-size: 15px; font-weight: 600; color: #faad14; margin-bottom: 6px;'>认知负荷</div>
+                <div style='font-size: 12px; color: #666; line-height: 1.4;'>心理压力程度</div>
+            </div>
+            <div style='text-align: center; min-width: 100px;'>
+                <div style='font-size: 15px; font-weight: 600; color: #1890ff; margin-bottom: 6px;'>元认知</div>
+                <div style='font-size: 12px; color: #666; line-height: 1.4;'>学习意识能力</div>
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
-
-    # 四个维度的布局
-    dim_col1, dim_col2, dim_col3, dim_col4 = st.columns(4, gap="large")
-
-    with dim_col1:
-        st.markdown("""
-        <div style='text-align: center;'>
-            <div style='font-size: 16px; font-weight: 600; color: #ff6b6b; margin-bottom: 8px;'>归因风格</div>
-            <div style='font-size: 13px; color: #999;'>如何解释失败</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with dim_col2:
-        st.markdown("""
-        <div style='text-align: center;'>
-            <div style='font-size: 16px; font-weight: 600; color: #52c41a; margin-bottom: 8px;'>自我效能感</div>
-            <div style='font-size: 13px; color: #999;'>对自己的信心</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with dim_col3:
-        st.markdown("""
-        <div style='text-align: center;'>
-            <div style='font-size: 16px; font-weight: 600; color: #faad14; margin-bottom: 8px;'>认知负荷</div>
-            <div style='font-size: 13px; color: #999;'>心理压力程度</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with dim_col4:
-        st.markdown("""
-        <div style='text-align: center;'>
-            <div style='font-size: 16px; font-weight: 600; color: #1890ff; margin-bottom: 8px;'>元认知</div>
-            <div style='font-size: 13px; color: #999;'>学习意识能力</div>
-        </div>
-        """, unsafe_allow_html=True)
 
 # ============================================================================
 # 对话页面：左图右谈
